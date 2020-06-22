@@ -3,6 +3,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import * as config from 'config';
 import { SwaggerValidatorPipe } from './common/swagger-validator.pipe';
+import { SearchUsersDto } from './users/dto/search-users.dto';
 
 const { version } = require('../package.json');
 
@@ -14,7 +15,9 @@ async function bootstrap() {
     .setDescription('The users API description')
     .setVersion(version)
     .build();
-  const document = SwaggerModule.createDocument(app, options);
+  const document = SwaggerModule.createDocument(app, options, {
+    extraModels: [SearchUsersDto],
+  });
 
   SwaggerModule.setup('api', app, document);
 

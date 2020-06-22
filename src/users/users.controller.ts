@@ -7,12 +7,14 @@ import {
   Body,
   Param,
   UseFilters,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserDto } from './dto/user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { MongoErrorFilter } from 'src/common/mongo-error.filter';
+import { SearchUsersDto } from './dto/search-users.dto';
 
 const USERS = '/users';
 const USER = '/users/:id';
@@ -28,8 +30,8 @@ export class UsersController {
   }
 
   @Get(USERS)
-  list(): Promise<UserDto[]> {
-    return this.users.list();
+  list(@Query() query: SearchUsersDto): Promise<UserDto[]> {
+    return this.users.list(query);
   }
 
   @Get(USER)
