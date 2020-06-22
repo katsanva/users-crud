@@ -6,16 +6,19 @@ import {
   Patch,
   Body,
   Param,
+  UseFilters,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserDto } from './dto/user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { MongoErrorFilter } from 'src/common/mongo-error.filter';
 
 const USERS = '/users';
 const USER = '/users/:id';
 
 @Controller()
+@UseFilters(MongoErrorFilter)
 export class UsersController {
   constructor(private users: UsersService) {}
 
