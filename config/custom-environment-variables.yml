@@ -1,1 +1,4 @@
+app:
+  port: PORT
+  env: NODE_ENV
 MongooseModule: MONGODB_URL
