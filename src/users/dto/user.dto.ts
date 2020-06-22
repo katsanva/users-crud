@@ -16,8 +16,7 @@ export class UserDto {
   firstName: string;
 
   @ApiProperty({
-    minLength: 8,
-    maxLength: 8,
+    pattern: '^(?=.*[A-Z])([A-z\\d]{8})$',
   })
   password: string;
 
