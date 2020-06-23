@@ -45,5 +45,38 @@ describe('UsersController (e2e)', () => {
         .send(payload)
         .expect(HttpStatus.CREATED);
     });
+
+    it('should validate input', () => {
+      const payload: CreateUserDto = {
+        email: faker.internet.email(),
+        password: faker.random.alphaNumeric(7),
+        firstName: faker.name.firstName(),
+        lastName: faker.name.lastName(),
+      };
+
+      return request(app.getHttpServer())
+        .post(USERS)
+        .send(payload)
+        .expect(HttpStatus.UNPROCESSABLE_ENTITY);
+    });
+
+    it('should not allow to use same email', async () => {
+      const payload: CreateUserDto = {
+        email: faker.internet.email(),
+        password: faker.random.alphaNumeric(7) + 'D',
+        firstName: faker.name.firstName(),
+        lastName: faker.name.lastName(),
+      };
+
+      await request(app.getHttpServer())
+        .post(USERS)
+        .send(payload)
+        .expect(HttpStatus.CREATED);
+
+      return request(app.getHttpServer())
+        .post(USERS)
+        .send(payload)
+        .expect(HttpStatus.CONFLICT);
+    });
   });
 });
