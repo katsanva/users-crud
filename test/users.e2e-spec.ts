@@ -6,7 +6,7 @@ import { AppModule } from '../src/app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { SearchUsersDto } from '../src/users/dto/search-users.dto';
 import { SwaggerValidatorPipe } from '../src/common/swagger-validator.pipe';
-import { USERS } from '../src/routes';
+import { USERS, USER } from '../src/routes';
 
 import { CreateUserDto } from '../src/users/dto/create-user.dto';
 
@@ -77,6 +77,16 @@ describe('UsersController (e2e)', () => {
         .post(USERS)
         .send(payload)
         .expect(HttpStatus.CONFLICT);
+    });
+  });
+
+  describe(`${USER} (GET)`, () => {
+    const constructRoute = (id: string) => USER.replace(':id', id);
+
+    it('should return 404 for random id', () => {
+      return request(app.getHttpServer())
+        .get(constructRoute(faker.random.alphaNumeric(5)))
+        .expect(HttpStatus.NOT_FOUND);
     });
   });
 });
