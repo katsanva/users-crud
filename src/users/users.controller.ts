@@ -16,6 +16,8 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { MongoErrorFilter } from '../common/mongo-error.filter';
 import { SearchUsersDto } from './dto/search-users.dto';
 import { USERS, USER } from '../routes';
+import { ObjectIdPipe } from '../common/object-id.pipe';
+import { ObjectId } from 'mongodb';
 
 @Controller()
 @UseFilters(MongoErrorFilter)
@@ -33,20 +35,20 @@ export class UsersController {
   }
 
   @Get(USER)
-  get(@Param('id') id: string): Promise<UserDto> {
+  get(@Param('id', ObjectIdPipe) id: ObjectId): Promise<UserDto> {
     return this.users.get(id);
   }
 
   @Patch(USER)
   update(
-    @Param('id') id: string,
+    @Param('id', ObjectIdPipe) id: ObjectId,
     @Body() payload: UpdateUserDto,
   ): Promise<UserDto> {
     return this.users.update(id, payload);
   }
 
   @Delete(USER)
-  async remove(@Param('id') id: string): Promise<void> {
+  async remove(@Param('id', ObjectIdPipe) id: ObjectId): Promise<void> {
     await this.users.remove(id);
   }
 }

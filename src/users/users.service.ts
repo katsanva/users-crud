@@ -5,6 +5,7 @@ import { Model, FilterQuery } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { SearchUsersDto } from './dto/search-users.dto';
+import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class UsersService {
@@ -39,15 +40,15 @@ export class UsersService {
     }, {});
   }
 
-  get(id: string): Promise<User> {
+  get(id: ObjectId): Promise<User> {
     return this.model.findById(id).exec();
   }
 
-  update(_id: string, payload: UpdateUserDto): Promise<User> {
+  update(_id: ObjectId, payload: UpdateUserDto): Promise<User> {
     return this.model.findOneAndUpdate({ _id }, payload).exec();
   }
 
-  remove(id: string): Promise<User> {
+  remove(id: ObjectId): Promise<User> {
     return this.model.findByIdAndDelete(id).exec();
   }
 }
