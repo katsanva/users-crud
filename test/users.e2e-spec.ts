@@ -9,8 +9,7 @@ import { SwaggerValidatorPipe } from '../src/common/swagger-validator.pipe';
 import { USERS, USER } from '../src/routes';
 
 import { CreateUserDto } from '../src/users/dto/create-user.dto';
-import { UserDto } from 'src/users/dto/user.dto';
-import { Server } from 'http';
+import { UserDto } from '../src/users/dto/user.dto';
 
 const constructUserRoute = (id: string) => USER.replace(':id', id);
 
@@ -224,7 +223,7 @@ describe('UsersController (e2e)', () => {
           return request(app.getHttpServer())
             .get(USERS)
             .query({
-              [key]: users[0][key],
+              [key]: users[2][key],
             })
             .expect(HttpStatus.OK, [users[2]]);
         });
@@ -233,7 +232,7 @@ describe('UsersController (e2e)', () => {
           return request(app.getHttpServer())
             .get(USERS)
             .query({
-              [key]: users[0][key].slice(0, -1),
+              [key]: users[2][key].slice(0, -1),
             })
             .expect(HttpStatus.OK, [users[2]]);
         });

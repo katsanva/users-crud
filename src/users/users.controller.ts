@@ -18,6 +18,7 @@ import { SearchUsersDto } from './dto/search-users.dto';
 import { USERS, USER } from '../routes';
 import { ObjectIdPipe } from '../common/object-id.pipe';
 import { ObjectId } from 'mongodb';
+import { PasswordHashPipe } from '../common/password-hash.pipe';
 
 @Controller()
 @UseFilters(MongoErrorFilter)
@@ -25,7 +26,7 @@ export class UsersController {
   constructor(private users: UsersService) {}
 
   @Post(USERS)
-  create(@Body() payload: CreateUserDto): Promise<UserDto> {
+  create(@Body(PasswordHashPipe) payload: CreateUserDto): Promise<UserDto> {
     return this.users.create(payload);
   }
 
