@@ -45,7 +45,7 @@ export class UsersService {
   }
 
   update(_id: ObjectId, payload: UpdateUserDto): Promise<User> {
-    return this.model.findOneAndUpdate({ _id }, payload).exec();
+    return this.model.findOneAndUpdate({ _id }, payload, { new: true }).exec();
   }
 
   remove(id: ObjectId): Promise<User> {

@@ -11,6 +11,8 @@ import { USERS, USER } from '../src/routes';
 import { CreateUserDto } from '../src/users/dto/create-user.dto';
 import { UserDto } from 'src/users/dto/user.dto';
 
+const constructUserRoute = (id: string) => USER.replace(':id', id);
+
 describe('UsersController (e2e)', () => {
   let app: INestApplication;
 
@@ -82,7 +84,6 @@ describe('UsersController (e2e)', () => {
   });
 
   describe(`${USER} (GET)`, () => {
-    const constructRoute = (id: string) => USER.replace(':id', id);
     let user: UserDto;
 
     beforeAll(async () => {
@@ -102,14 +103,53 @@ describe('UsersController (e2e)', () => {
 
     it('should return 404 for random id', () => {
       return request(app.getHttpServer())
-        .get(constructRoute(faker.random.alphaNumeric(5)))
+        .get(constructUserRoute(faker.random.alphaNumeric(5)))
         .expect(HttpStatus.NOT_FOUND);
     });
 
     it('should return 200 on valid id', () => {
       return request(app.getHttpServer())
-        .get(constructRoute(user._id))
+        .get(constructUserRoute(user._id))
         .expect(HttpStatus.OK, user);
+    });
+  });
+
+  describe(`${USER} (PATCH)`, () => {
+    let user: UserDto;
+
+    beforeAll(async () => {
+      const payload: CreateUserDto = {
+        email: faker.internet.email(),
+        password: faker.random.alphaNumeric(7) + 'D',
+        firstName: faker.name.firstName(),
+        lastName: faker.name.lastName(),
+      };
+
+      const res = await request(app.getHttpServer())
+        .post(USERS)
+        .send(payload);
+
+      user = res.body;
+    });
+
+    it('should return 404 for random id', () => {
+      return request(app.getHttpServer())
+        .patch(constructUserRoute(faker.random.alphaNumeric(5)))
+        .expect(HttpStatus.NOT_FOUND);
+    });
+
+    it('should return 200 on valid id', () => {
+      return request(app.getHttpServer())
+        .patch(constructUserRoute(user._id))
+        .send({ firstName: 'foo' })
+        .expect(HttpStatus.OK, { ...user, firstName: 'foo' });
+    });
+
+    it('should validate input', () => {
+      return request(app.getHttpServer())
+        .patch(constructUserRoute(user._id))
+        .send({ password: 'foo' })
+        .expect(HttpStatus.UNPROCESSABLE_ENTITY);
     });
   });
 });
