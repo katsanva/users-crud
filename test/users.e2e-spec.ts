@@ -10,11 +10,28 @@ import { USERS, USER } from '../src/routes';
 
 import { CreateUserDto } from '../src/users/dto/create-user.dto';
 import { UserDto } from 'src/users/dto/user.dto';
+import { Server } from 'http';
 
 const constructUserRoute = (id: string) => USER.replace(':id', id);
 
 describe('UsersController (e2e)', () => {
   let app: INestApplication;
+
+  const createUser = async () => {
+    const payload: CreateUserDto = {
+      email: faker.internet.email(),
+      password: faker.random.alphaNumeric(7) + 'D',
+      firstName: faker.name.firstName(),
+      lastName: faker.name.lastName(),
+      city: faker.random.alphaNumeric(20),
+    };
+
+    const res = await request(app.getHttpServer())
+      .post(USERS)
+      .send(payload);
+
+    return res.body;
+  };
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -118,18 +135,7 @@ describe('UsersController (e2e)', () => {
     let user: UserDto;
 
     beforeAll(async () => {
-      const payload: CreateUserDto = {
-        email: faker.internet.email(),
-        password: faker.random.alphaNumeric(7) + 'D',
-        firstName: faker.name.firstName(),
-        lastName: faker.name.lastName(),
-      };
-
-      const res = await request(app.getHttpServer())
-        .post(USERS)
-        .send(payload);
-
-      user = res.body;
+      user = await createUser();
     });
 
     it('should return 404 for random id', () => {
@@ -150,6 +156,99 @@ describe('UsersController (e2e)', () => {
         .patch(constructUserRoute(user._id))
         .send({ password: 'foo' })
         .expect(HttpStatus.UNPROCESSABLE_ENTITY);
+    });
+  });
+
+  describe(`${USER} (DELETE)`, () => {
+    let user: UserDto;
+
+    beforeAll(async () => {
+      user = await createUser();
+    });
+
+    it('should return 404 for random id', () => {
+      return request(app.getHttpServer())
+        .delete(constructUserRoute(faker.random.alphaNumeric(5)))
+        .expect(HttpStatus.NOT_FOUND);
+    });
+
+    describe('valid id', () => {
+      let status: HttpStatus;
+
+      beforeAll(async () => {
+        const res = await request(app.getHttpServer()).delete(
+          constructUserRoute(user._id),
+        );
+
+        status = res.status;
+      });
+
+      it('should return 200 on valid id', () => {
+        expect(status).toBe(HttpStatus.OK);
+      });
+
+      it('should not allow to delete user twice', () => {
+        request(app.getHttpServer())
+          .delete(constructUserRoute(user._id))
+          .expect(HttpStatus.NOT_FOUND);
+      });
+    });
+  });
+
+  describe(`${USERS} (GET)`, () => {
+    const users: UserDto[] = [];
+
+    beforeAll(async () => {
+      users.push(await createUser());
+      users.push(await createUser());
+      users.push(await createUser());
+    });
+
+    it('should return list of users', async () => {
+      const { status, body } = await request(app.getHttpServer()).get(USERS);
+
+      expect(status).toBe(HttpStatus.OK);
+      expect(body.length >= users.length).toBeTruthy();
+    });
+
+    describe('filters', () => {
+      const keys: (keyof UserDto)[] = [
+        'email',
+        'firstName',
+        'lastName',
+        'city',
+      ];
+
+      keys.forEach(key => {
+        it(`should filter by full ${key}`, () => {
+          return request(app.getHttpServer())
+            .get(USERS)
+            .query({
+              [key]: users[0][key],
+            })
+            .expect(HttpStatus.OK, [users[2]]);
+        });
+
+        it(`should filter by partial ${key}`, () => {
+          return request(app.getHttpServer())
+            .get(USERS)
+            .query({
+              [key]: users[0][key].slice(0, -1),
+            })
+            .expect(HttpStatus.OK, [users[2]]);
+        });
+      });
+
+      it(`should filter by more than one fields`, async () => {
+        const result = await request(app.getHttpServer())
+          .get(USERS)
+          .query({
+            firstName: 'a',
+            city: 'a',
+          });
+
+        expect(result.body.length >= 1);
+      });
     });
   });
 });
