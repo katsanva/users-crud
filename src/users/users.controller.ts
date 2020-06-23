@@ -13,7 +13,7 @@ import { UsersService } from './users.service';
 import { UserDto } from './dto/user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { MongoErrorFilter } from 'src/common/mongo-error.filter';
+import { MongoErrorFilter } from '../common/mongo-error.filter';
 import { SearchUsersDto } from './dto/search-users.dto';
 
 const USERS = '/users';
