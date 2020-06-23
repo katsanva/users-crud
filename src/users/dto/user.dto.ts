@@ -30,5 +30,5 @@ export class UserDto {
     minLength: 1,
     maxLength: 25,
   })
-  city: string;
+  city?: string;
 }

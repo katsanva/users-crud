@@ -15,9 +15,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { MongoErrorFilter } from '../common/mongo-error.filter';
 import { SearchUsersDto } from './dto/search-users.dto';
-
-const USERS = '/users';
-const USER = '/users/:id';
+import { USERS, USER } from '../routes';
 
 @Controller()
 @UseFilters(MongoErrorFilter)
