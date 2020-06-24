@@ -47,6 +47,23 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
+## Config
+
+App can be configured through env variables:
+
+```
+# port :)
+PORT=
+# mongodb url :)
+MONGODB_URL=
+```
+
+See [node-config](https://github.com/lorenwest/node-config) for details.
+
+## Swagger
+
+Swagger UI is available on `/api`
+
 ## Test
 
 ```bash
